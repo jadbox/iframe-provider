@@ -201,9 +201,10 @@ export class IFrameEthereumProvider extends EventEmitter<
     | JsonRpcSucessfulResponseMessage<TResult>
     | JsonRpcErrorResponseMessage<TErrorData>
   > {
-    const id = isNaN(optionalId as any)
-      ? getUniqueId()
-      : (optionalId as number);
+    const id =
+      optionalId !== null && optionalId !== undefined
+        ? optionalId
+        : getUniqueId();
 
     const payload: JsonRpcRequestMessage = {
       jsonrpc: JSON_RPC_VERSION,
