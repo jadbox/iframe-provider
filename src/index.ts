@@ -104,7 +104,8 @@ export type IFrameEthereumProviderEventTypes =
   | 'notification'
   | 'chainChanged'
   | 'networkChanged'
-  | 'accountsChanged';
+  | 'accountsChanged'
+  | 'eth_subscription';
 
 /**
  * Export the type information about the different events that are emitted.
@@ -115,6 +116,8 @@ export interface IFrameEthereumProvider {
   on(event: 'close', handler: (code: number, reason: string) => void): this;
 
   on(event: 'notification', handler: (result: any) => void): this;
+
+  on(event: 'eth_subscription', handler: (result: any) => void): this;
 
   on(event: 'chainChanged', handler: (chainId: string) => void): this;
 
@@ -357,6 +360,10 @@ export class IFrameEthereumProvider extends EventEmitter<
     // If the method is a request from the parent window, it is likely a subscription.
     if ('method' in message) {
       switch (message.method) {
+        case 'eth_subscription':
+          this.emitEthSubNotification(message.params);
+          break;
+
         case 'notification':
           this.emitNotification(message.params);
           break;
@@ -383,6 +390,10 @@ export class IFrameEthereumProvider extends EventEmitter<
       }
     }
   };
+
+  private emitEthSubNotification(result: any) {
+    this.emit('eth_subscription', result);
+  }
 
   private emitNotification(result: any) {
     this.emit('notification', result);
